@@ -58,7 +58,7 @@ function playClickSound(){
 
 
 /**
- * ±£´æÃ¿Ò»¸öµ¥´ÊµÄµ±Ç°×´Ì¬
+ * ä¿å­˜æ¯ä¸€ä¸ªå•è¯çš„å½“å‰çŠ¶æ€
  * @type {{word: {x: number, y: number}}}
  */
 var wordsDisplay = {"word": {"x" : 0, "y" : 0}};
@@ -72,21 +72,17 @@ var wordGen = function(){
     return wd;
 };
 
-var charGen = function(word){
-    var chars = word.split("");
-};
-
 $ = function (id) {
     return document.getElementById(id);
 };
 
-var c = $('c');//»ñÈ¡»­²¼¶ÔÏó
-var ctx = c.getContext('2d');//»ñÈ¡2d»­±Ê¶ÔÏó
+var c = $('c');//è·å–ç”»å¸ƒå¯¹è±¡
+var ctx = c.getContext('2d');//è·å–2dç”»ç¬”å¯¹è±¡
 var bc = 20;
-var hasLockWord = false;//ÊÇ·ñÒÑ¾­ÓĞµ¥´ÊËø¶¨
+var hasLockWord = false;//æ˜¯å¦å·²ç»æœ‰å•è¯é”å®š
 
 function drawGrid() {
-    //»­ºáÏß
+    //ç”»æ¨ªçº¿
     for (var i = 0; i <= c.width; i = i + bc) {
         ctx.strokeStyle = 'gray';
         ctx.beginPath();
@@ -95,7 +91,7 @@ function drawGrid() {
         ctx.lineTo(c.width, i);
         ctx.stroke();
     }
-    //»­ÊúÏß
+    //ç”»ç«–çº¿
     for (var i = 0; i <= c.height; i = i + bc) {
         ctx.strokeStyle = 'gray';
         ctx.beginPath();
@@ -106,19 +102,6 @@ function drawGrid() {
     }
 }
 
-
-
-!function () {
-    //drawGrid();
-    //setTimeout(arguments.callee, 200);
-}();
-
-function drawChar(char, x, y){
-    ctx.font= bc + "px Verdana";
-    ctx.strokeStyle = 'red';
-    ctx.strokeText(char,x ,y);
-}
-
 var charNode = function(char, x, y){
     this.char = char;
     this.x = x;
@@ -126,29 +109,25 @@ var charNode = function(char, x, y){
 };
 
 var charXY = function(char, x, y){
-  this.char = char;
-  this.x = x;
-  this.y = y;
+    this.char = char;
+    this.x = x;
+    this.y = y;
 };
 
 /**
  * @param word
- * @param endIndex,´Ó0¸ö×Ö·ûµ½µÚendIndex¸ö×Ö·û±»±êÊ¶ÒÑ¾­»÷ÖĞ
+ * @param endIndex,ä»0ä¸ªå­—ç¬¦åˆ°ç¬¬endIndexä¸ªå­—ç¬¦è¢«æ ‡è¯†å·²ç»å‡»ä¸­
  */
-var wordState = function(lock, word,endIndex, x, y){
-    this.lock = lock;//Ëø¶¨×´Ì¬µÄµ¥´Ê,¼´¸Ãµ¥´ÊÖÁÉÙÒÑ¾­»÷ÖĞÁËÒ»¸ö×ÖÄ¸
+var wordState = function(lock, word,endIndex, x, y,dir){
+    this.lock = lock;//é”å®šçŠ¶æ€çš„å•è¯,å³è¯¥å•è¯è‡³å°‘å·²ç»å‡»ä¸­äº†ä¸€ä¸ªå­—æ¯
     this.word = word;
-    this.andIndex = endIndex;
+    this.endIndex = endIndex;
     this.x = x;
     this.y = y;
     this.charXY = [];
+    this.dir = dir;//ç§»åŠ¨æ–¹å‘
 };
 
-var charNodes = [];
-var charnode1 = new charNode('china', bc, bc);
-charNodes.push(charnode1);
-
-var existsWord = [];
 var wordStates = [];
 
 document.onkeyup = function(ev){
@@ -163,23 +142,20 @@ document.onkeyup = function(ev){
             if(!ws.lock){
                 continue;
             }
-            var endIndex = ws.andIndex;
             var wd = ws.word;
             var chars = wd.split("");
             for(var k = 0; k < chars.length; k++){
-                if(chars[k] === inputChar){
+                if(chars[k] === inputChar && k === ws.endIndex + 1){
                     playHitSound();
-                    //¼¯ÖĞ×ÖÄ¸µÄ¸öÊı´óÓÚ1ÇÒĞ¡ÓÚµ¥´ÊµÄ×Ü×ÖÄ¸¸öÊı
-                    if(k < chars.length-1){
-                        ws.andIndex++;
+                    //é›†ä¸­å­—æ¯çš„ä¸ªæ•°å¤§äº1ä¸”å°äºå•è¯çš„æ€»å­—æ¯ä¸ªæ•°
+                    if(k < chars.length){
+                        ws.endIndex++;
                     }
-                    //µ¥´ÊµÄ×îºóÒ»¸ö×ÖÄ¸±»»÷ÖĞ,¸Ãµ¥´ÊÏûÊ§,ÓĞÈ«¾ÖËø¶¨µÄµ¥´ÊµÄ±êÊ¶ÖÃ·ñ
-                    if(k === chars.length-1){
+                    //å•è¯çš„æœ€åä¸€ä¸ªå­—æ¯è¢«å‡»ä¸­,è¯¥å•è¯æ¶ˆå¤±,æœ‰å…¨å±€é”å®šçš„å•è¯çš„æ ‡è¯†ç½®å¦
+                    if(ws.endIndex === chars.length-1){
                         hasLockWord = false;
-                        chearWord(wordStates[i], wordStates[i].x, wordStates[i].y);
                         wordStates.remove(i);
-                        //ctx.clearRect(0,0, c.width, c.height);
-                        chearWord(wd, ws.x,ws.y);
+                        clearWord(wd, ws.x,ws.y);
                     }
                     return;
                 }
@@ -188,33 +164,17 @@ document.onkeyup = function(ev){
     }else{
         for(var i = 0;i < wordStates.length; i++){
             var ws = wordStates[i];
-            var endIndex = ws.andIndex;
-            var wd = ws.word;
-            var chars = wd.split("");
+            var chars = ws.word.split("");
             for(var k = 0; k < chars.length; k++){
-                if(chars[k] === inputChar){
+                if(chars[k] === inputChar && k === ws.endIndex + 1){
                     playHitSound();
-                    //µÚÒ»´Î»÷ÖĞ£¬Ëø¶¨µ¥´Ê
-                    if(k === 0 && endIndex === -1){
+                    //ç¬¬ä¸€æ¬¡å‡»ä¸­ï¼Œé”å®šå•è¯
+                    if(k === 0 && ws.endIndex === -1){
                         hasLockWord = true;
                         ws.lock = true;
-                        ws.andIndex = 0;
-                    }else{
-                        //¼¯ÖĞ×ÖÄ¸µÄ¸öÊı´óÓÚ1ÇÒĞ¡ÓÚµ¥´ÊµÄ×Ü×ÖÄ¸¸öÊı
-                        if(k < chars.length-1){
-                            ws.andIndex++;
-                        }
-
-                        //µ¥´ÊµÄ×îºóÒ»¸ö×ÖÄ¸±»»÷ÖĞ,¸Ãµ¥´ÊÏûÊ§,ÓĞÈ«¾ÖËø¶¨µÄµ¥´ÊµÄ±êÊ¶ÖÃ·ñ
-                        if(k === chars.length-1){
-                            hasLockWord = false;
-                            chearWord(wordStates[i], wordStates[i].x, wordStates[i].y);
-                            wordStates.remove(i);
-                            //ctx.clearRect(0,0, c.width, c.height);
-                            chearWord(wd, ws.x,ws.y);
-                        }
+                        ws.endIndex = 0;
+                        return;
                     }
-                    return;
                 }
             }
         }
@@ -222,14 +182,14 @@ document.onkeyup = function(ev){
 };
 
 /**
- * fillTextµ¥¸ö×ÖÄ¸
+ * fillTextå•ä¸ªå­—æ¯
  * @param char
  * @param x
  * @param y
  * @param hit
  */
-function drewChar(char,x, y, hit){
-    ctx.font= bc * 0.75 + "px Verdana";
+function drawChar(char,x, y, hit){
+    ctx.font= bc * 0.5 + "px Verdana";
     if(hit){
         ctx.fillStyle = 'red';
     }else{
@@ -239,9 +199,9 @@ function drewChar(char,x, y, hit){
     return ctx.measureText(char).width;
 }
 
-function chearWord(word, x, y){
+function clearWord(word, x, y){
     ctx.fillStyle = 'white';
-    ctx.font= bc * 0.75 + "px Verdana";
+    ctx.font= bc * 0.5 + "px Verdana";
     ctx.fillText(word, x, y);
 
     ctx.strokeStyle = 'white';
@@ -252,67 +212,59 @@ function chearWord(word, x, y){
 }
 
 
-    !function initGanme(){
-        //ÏÔÊ¾µÄ»î¶¯µÄµ¥´ÊµÄ¸öÊı
-        while(wordStates.length < 10){
-            var word = wordGen();
-            wordStates.push(new wordState(false,word, -1, randomNum(0, c.width),bc));
-        }
-        setTimeout(arguments.callee, 200);
-    }();
+!function initGanme(){
+    //æ˜¾ç¤ºçš„æ´»åŠ¨çš„å•è¯çš„ä¸ªæ•°
+    while(wordStates.length < 10){
+        var word = wordGen();
+        var dir = randomNum(1,100) > 50 ? 1 : -1;
+        wordStates.push(new wordState(false,word, -1, randomNum(0, c.width - bc * 4),bc / 5 * randomNum(1,15), dir));
+    }
+
+    //ctx.fillStyle = 'white';
+    //ctx.fillRect(0, c.height - bc * 5, c.width, c.height - bc * 5);
+
+    setTimeout(arguments.callee, 500);
+}();
 
 !function () {
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0,0, c.width, c.height);
 
     var wordx = 0;
     var wordy = 0;
     for(var i = 0; i < wordStates.length; i++){
         var ws = wordStates[i];
         var wd = ws.word;
-
         wordx = ws.x;
         wordy = ws.y;
-
-        var endIndex = ws.andIndex;
+        var endIndex = ws.endIndex;
         var chars = wd.split("");
-
-        if(existsWord.contains(wd)){
-            chearWord(wd, wordx, wordy);
+        clearWord(wd, wordx, wordy);
+        //var randomOffset = randomNum(2,8);
+        var randomOffset = 0.3;
+        if(wordx > c.width - bc * 4 || wordx < 0){
+            ws.dir *= -1;
         }
-        var dirflag = randomNum(1,100) > 50 ? 1 : -1;
-        var randomOffeset = randomNum(2,8);
-        if(wordx + ws.x +  randomOffeset * dirflag > c.width - 100 || wordx + ws.x +  randomOffeset * dirflag <= bc){
-            dirflag *= -1;
-        }
-        wordx += randomOffeset * dirflag;
-        wordy += randomOffeset / 10;
-        if(wordx < 0){
-            wordx = 10;
-        }else if(wordx > c.width){
-            wordx = c.width - 20;
-        }
-
+        wordx += randomOffset * ws.dir;
+        wordy += randomNum(1,2) - 0.8;
         wordStates[i].x = wordx;
         wordStates[i].y = wordy;
-        var charW = 0;//Ã¿¸ö×ÖÄ¸µÄÏñËØ¿í
-        var charX = wordx;//Ã¿¸ö×ÖÄ¸µÄX×ø±ê
+        if(wordy > c.height - bc * 4){//æ‰
+            if(ws.lock){
+                hasLockWord = false;
+            }
+            wordStates.remove(i);
+        }
+        var charW = 0;//æ¯ä¸ªå­—æ¯çš„åƒç´ å®½
+        var charX = wordx;//æ¯ä¸ªå­—æ¯çš„Xåæ ‡
         for(var k =0;k < chars.length; k++){
-            charW = drewChar(chars[k], charX, wordy, k <= endIndex ? true : false);
-            existsWord.push(wd);
+            charW = drawChar(chars[k], charX, wordy, k <= endIndex ? true : false);
             charX += charW;
             var charXYObj = new charXY(chars[k], charX, wordy);
             ws.charXY.push(charXYObj);
         }
     }
 
-
-    setTimeout(arguments.callee, 100);
+    setTimeout(arguments.callee, 50);
 }();
-
-
-
-
-
-
-
-
 

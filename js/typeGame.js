@@ -102,18 +102,6 @@ function drawGrid() {
     }
 }
 
-var charNode = function(char, x, y){
-    this.char = char;
-    this.x = x;
-    this.y = y;
-};
-
-var charXY = function(char, x, y){
-    this.char = char;
-    this.x = x;
-    this.y = y;
-};
-
 /**
  * @param word
  * @param endIndex,从0个字符到第endIndex个字符被标识已经击中
@@ -124,7 +112,6 @@ var wordState = function(lock, word,endIndex, x, y,dir){
     this.endIndex = endIndex;
     this.x = x;
     this.y = y;
-    this.charXY = [];
     this.dir = dir;//移动方向
 };
 
@@ -207,8 +194,6 @@ function clearWord(word, x, y){
     ctx.strokeStyle = 'white';
     ctx.strokeText(word, x, y);
     ctx.fillText(word, x, y);
-
-    //ctx.clearRect(x ,y, ctx.measureText(word), bc * 0.75);
 }
 
 
@@ -219,9 +204,6 @@ function clearWord(word, x, y){
         var dir = randomNum(1,100) > 50 ? 1 : -1;
         wordStates.push(new wordState(false,word, -1, randomNum(0, c.width - bc * 4),bc / 5 * randomNum(1,15), dir));
     }
-
-    //ctx.fillStyle = 'white';
-    //ctx.fillRect(0, c.height - bc * 5, c.width, c.height - bc * 5);
 
     setTimeout(arguments.callee, 500);
 }();
@@ -260,8 +242,6 @@ function clearWord(word, x, y){
         for(var k =0;k < chars.length; k++){
             charW = drawChar(chars[k], charX, wordy, k <= endIndex ? true : false);
             charX += charW;
-            var charXYObj = new charXY(chars[k], charX, wordy);
-            ws.charXY.push(charXYObj);
         }
     }
 

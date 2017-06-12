@@ -46,6 +46,17 @@ function randomNum(minNum,maxNum){
             break;
     }
 }
+
+var audio1 = document.getElementById("hitMusic");
+function playHitSound(){
+    audio1.play();
+}
+var audio2 = document.getElementById("clickMusic");
+function playClickSound(){
+    audio2.play();
+}
+
+
 /**
  * 保存每一个单词的当前状态
  * @type {{word: {x: number, y: number}}}
@@ -141,6 +152,9 @@ var existsWord = [];
 var wordStates = [];
 
 document.onkeyup = function(ev){
+
+    playClickSound();
+
     var inputChar = String.fromCharCode(ev.keyCode).toLowerCase();
 
     if(hasLockWord){
@@ -154,6 +168,7 @@ document.onkeyup = function(ev){
             var chars = wd.split("");
             for(var k = 0; k < chars.length; k++){
                 if(chars[k] === inputChar){
+                    playHitSound();
                     //集中字母的个数大于1且小于单词的总字母个数
                     if(k < chars.length-1){
                         ws.andIndex++;
@@ -178,6 +193,7 @@ document.onkeyup = function(ev){
             var chars = wd.split("");
             for(var k = 0; k < chars.length; k++){
                 if(chars[k] === inputChar){
+                    playHitSound();
                     //第一次击中，锁定单词
                     if(k === 0 && endIndex === -1){
                         hasLockWord = true;
